@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: mcp-airbnb-http
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        fromService: true
+    healthCheckPath: /health
