@@ -1,5 +1,4 @@
 import fetch from 'node-fetch';
-import robotsParser from 'robots-parser';
 
 export const USER_AGENT = "ModelContextProtocol/1.0 (Autonomous; +https://github.com/modelcontextprotocol/servers)";
 export const BASE_URL = "https://www.airbnb.com";
@@ -13,21 +12,41 @@ export async function fetchRobotsTxt() {
     console.log('Robots.txt fetched successfully');
   } catch (error) {
     console.error("Error fetching robots.txt:", error);
-    robotsTxtContent = ""; // Empty robots.txt means everything is allowed
+    robotsTxtContent = ""; 
   }
 }
 
 export function isPathAllowed(path) {
   if (!robotsTxtContent) {
-    return true; // If we couldn't fetch robots.txt, assume allowed
-  }
-
-  const robots = robotsParser(`${BASE_URL}/robots.txt`, robotsTxtContent);
-  const allowed = robots.isAllowed(path, USER_AGENT);
-  
-  if (!allowed) {
-    console.error(`Path ${path} is disallowed by robots.txt`);
+    return true; // Se não conseguimos buscar robots.txt, permitimos tudo
   }
   
-  return allowed;
+  // Análise simples do robots.txt
+  const lines = robotsTxtContent.split('\n');
+  let currentUserAgent = '';
+  let disallowedPaths = [];
+  
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    
+    if (trimmedLine.startsWith('User-agent:')) {
+      currentUserAgent = trimmedLine.split(':')[1].trim();
+    } else if (trimmedLine.startsWith('Disallow:') && 
+               (currentUserAgent === '*' || currentUserAgent === USER_AGENT)) {
+      const disallowedPath = trimmedLine.split(':')[1].trim();
+      if (disallowedPath) {
+        disallowedPaths.push(disallowedPath);
+      }
+    }
+  }
+  
+  // Verifica se o caminho é permitido
+  for (const disallowedPath of disallowedPaths) {
+    if (path.startsWith(disallowedPath)) {
+      console.error(`Path ${path} is disallowed by robots.txt`);
+      return false;
+    }
+  }
+  
+  return true;
 }
