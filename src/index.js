@@ -1,11 +1,9 @@
 #!/usr/bin/env node
-
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { setupRoutes } from './server.js';
-import { fetchRobotsTxt } from './robots.js';
 
 dotenv.config();
 
@@ -50,20 +48,9 @@ app.use('*', (req, res) => {
   });
 });
 
-// Initialize robots.txt on startup
-async function startServer() {
-  try {
-    await fetchRobotsTxt();
-    console.log('Robots.txt loaded successfully');
-    
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 MCP Airbnb HTTP Server running on port ${PORT}`);
-      console.log(`🌐 Health check: http://localhost:${PORT}/health`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-}
-
-startServer();
+// Start server without robots.txt (simplified)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 MCP Airbnb HTTP Server running on port ${PORT}`);
+  console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+  console.log('✅ Server started successfully (robots.txt disabled for now)');
+});
