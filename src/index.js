@@ -5,7 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { setupRoutes } from './server.js';
-import { fetchRobotsTxt } from './utils/robots.js';
+import { fetchRobotsTxt } from './src/utils/robots.js';
 
 dotenv.config();
 
